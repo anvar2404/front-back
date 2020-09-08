@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Route, useParams } from 'react-router-dom'
-import Head from './head'
 import CategoryList from './category-list'
 import TasksList from './tasks-list'
+import Header from './Header'
 
 const Home = () => {
   const { category } = useParams()
@@ -23,7 +23,7 @@ const Home = () => {
 
   const addCategory = (newCategory) => {
     axios.post(`/api/v1/tasks/${newCategory}`)
-    setCategories([...categories,newCategory])
+    setCategories([...categories, newCategory])
   }
 
   const filterTime = (timespan) => {
@@ -42,16 +42,30 @@ const Home = () => {
     axios.delete(`/api/v1/tasks/${category}/${id}`)
     setTasks(tasks.filter((el) => el.taskId !== id))
   }
+  const deleteCategory = (categoryToDelete) => {
+    axios.delete(`/api/v1/${categoryToDelete}`)
+    setCategories(categories.filter((el) => el !== categoryToDelete))
+  }
+  const saveTaskName = (taskName, id) => {
+    axios.patch(`/api/v1/tasks-rename/${category}/${id}`, { title: taskName })
+    setTasks(tasks.map((el) => (el.taskId === id ? { ...el, title: taskName } : el)))
+  }
 
   return (
     <div>
-      <Head title="Hello" />
       <div className="flex items-center justify-center h-screen">
-        <div className="bg-yellow-400  font-bold rounded-lg border shadow-lg p-10">
+        <div className="rounded-lg border shadow-2xl p-10">
+          <Header />
           <Route
             exact
             path="/"
-            component={() => <CategoryList categories={categories} addCategory={addCategory} />}
+            component={() => (
+              <CategoryList
+                categories={categories}
+                addCategory={addCategory}
+                deleteCategory={deleteCategory}
+              />
+            )}
           />
           <Route
             exact
@@ -63,6 +77,7 @@ const Home = () => {
                 switchStatus={switchStatus}
                 deleteTask={deleteTask}
                 filterTime={filterTime}
+                saveTaskName={saveTaskName}
               />
             )}
           />

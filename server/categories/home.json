@@ -13,25 +13,25 @@
   },
   {
     "taskId": "MTogF7QHC",
-    "title": "create a server",
-    "status": "in progress",
-    "_isDeleted": false,
+    "title": "create a server(new)",
+    "status": "done",
+    "_isDeleted": true,
     "_createdAt": 1597944735787,
     "_deletedAt": null
   },
   {
     "taskId": "izi0-gYdZ",
     "title": "clean the house",
-    "status": "in progress",
-    "_isDeleted": false,
+    "status": "done",
+    "_isDeleted": true,
     "_createdAt": 1597946470529,
     "_deletedAt": null
   },
   {
     "taskId": "4NBdJ6OUc",
     "title": "make a coffee",
-    "status": "in progress",
-    "_isDeleted": false,
+    "status": "done",
+    "_isDeleted": true,
     "_createdAt": 1598429048891,
     "_deletedAt": null
   },
@@ -62,9 +62,25 @@
   {
     "taskId": "TA3Ns5fre",
     "title": "фзаытадьвлыа",
-    "status": "new",
-    "_isDeleted": false,
+    "status": "done",
+    "_isDeleted": true,
     "_createdAt": 1598898178171,
+    "_deletedAt": null
+  },
+  {
+    "taskId": "t1Km6Cxzz",
+    "title": "lol",
+    "status": "done",
+    "_isDeleted": true,
+    "_createdAt": 1599542201298,
+    "_deletedAt": null
+  },
+  {
+    "taskId": "E6t4tFQpZ",
+    "title": "lol",
+    "status": "in progress",
+    "_isDeleted": false,
+    "_createdAt": 1599543621799,
     "_deletedAt": null
   }
 ]

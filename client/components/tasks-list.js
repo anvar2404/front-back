@@ -1,71 +1,47 @@
 import React, { useState } from 'react'
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom'
 import Timespan from './timespan'
+import TasksListItem from './tasks-list-item'
 
-const TasksList = ({ tasks, addTask, switchStatus, deleteTask, filterTime }) => {
+const TasksList = ({ tasks, addTask, switchStatus, deleteTask, filterTime, saveTaskName }) => {
   const [taskInput, setTaskInput] = useState('')
   return (
     <div className="flex flex-col min-h-full">
       <Timespan filterTime={filterTime} />
-      <div className="py-8">
-        {tasks.map((task) => (
-          <div key={task.taskId} className="flex justify-between mb-2">
-            {task.title}
-            {task.status === 'new' && (
-              <button
-                type="button"
-                onClick={() => switchStatus(task.taskId, 'in progress')}
-                className="p-1 ml-2 bg-gray-400"
-              >
-                In progress
-              </button>
-            )}
-            {task.status === 'in progress' && (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => switchStatus(task.taskId, 'blocked')}
-                  className="p-1 ml-2 bg-red-400"
-                >
-                  Blocked
-                </button>
-                <button
-                  type="button"
-                  onClick={() => switchStatus(task.taskId, 'done')}
-                  className="p-1 ml-2 bg-green-400"
-                >
-                  Done
-                </button>
-              </div>
-            )}
-            {task.status === 'blocked' && (
-              <button
-                type="button"
-                onClick={() => switchStatus(task.taskId, 'in progress')}
-                className="p-1 ml-2 bg-teal-400"
-              >
-                Unblock
-              </button>
-            )}
-            {task.status === 'done' && (
-              <button
-                type="button"
-                onClick={() => deleteTask(task.taskId)}
-                className="p-1 ml-2 bg-red-700"
-              >
-                Delete
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-        <div className="footer flex flex-col text-center">
-            <input type="text" onChange={(e) => setTaskInput(e.target.value)} />
-            <button type="button" onClick={() => addTask(taskInput)}>
-                add task
-            </button>
-            <Link to="/">Back</Link>
+      {tasks.map((task) => (
+        <TasksListItem
+          key={task.taskId}
+          task={task}
+          switchStatus={switchStatus}
+          deleteTask={deleteTask}
+          saveTaskName={saveTaskName}
+        />
+      ))}
+      <div className="footer flex flex-col text-center">
+        <div className="border-t border-b border-black border-solid">
+          <input
+            type="text"
+            className="focus:outline-none"
+            onChange={(e) => setTaskInput(e.target.value)}
+          />
         </div>
+        <button type="button" className="block mx-auto py-4" onClick={() => addTask(taskInput)}>
+          <svg
+            version="1.1"
+            id="Capa_1"
+            xmlns="http://www.w3.org/2000/svg"
+            width="25px"
+            height="25px"
+            viewBox="0 0 512 512"
+          >
+            <path
+              d="M492,236H276V20c0-11.046-8.954-20-20-20c-11.046,0-20,8.954-20,20v216H20c-11.046,0-20,8.954-20,20s8.954,20,20,20h216
+			v216c0,11.046,8.954,20,20,20s20-8.954,20-20V276h216c11.046,0,20-8.954,20-20C512,244.954,503.046,236,492,236z"
+            />
+          </svg>
+        </button>
+        <Link to="/">Back</Link>
+      </div>
     </div>
   )
 }

@@ -11,7 +11,7 @@ import shortid from 'shortid'
 import config from './config'
 import Html from '../client/html'
 
-const { readFile, writeFile, readdir } = require('fs').promises
+const { readFile, writeFile, readdir, unlink } = require('fs').promises
 
 const Root = () => ''
 
@@ -74,48 +74,14 @@ server.get('/api/v1/tasks/:category', async (req, res) => {
   const tasks = filteredKeys(await read(category))
   res.json(tasks)
 })
-server.post('/api/v1/tasks/:category', async (req, res) => {
-  const { category } = req.params
-  if (Object.keys(req.body).length === 0) {
-      await write(category,[])
-      res.json({status: 'Added'})
-  }
-  else {
-    const tasks = await read(category)
-    const newTask = {
-      taskId: shortid.generate(),
-      title: req.body.title,
-      status: 'new',
-      _isDeleted: false,
-      _createdAt: +new Date(),
-      _deletedAt: null
-    }
-    const addedTasks = [...tasks, newTask]
-    await write(category, addedTasks)
-    res.json({ status: 'added successfully', newTask })
-  }
+
+server.get('/api/v1/categories', async (req, res) => {
+  const categories = (await readdir(`${__dirname}/categories`)).map((el) =>
+    el.split('.json').join('')
+  )
+  res.json(categories)
 })
-server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
-  const { category, id } = req.params
-  const newStatus = req.body.status
-  const statuses = ['new', 'in progress', 'done', 'blocked']
-  if (statuses.includes(newStatus)) {
-    const tasks = await read(category)
-    const updatedStatus = tasks.map((el) => (el.taskId === id ? { ...el, status: newStatus } : el))
-    await write(category, updatedStatus)
-    res.json({ status: 'updated successfully' })
-  } else {
-    res.status(501)
-    res.json({ status: 'error', message: 'incorrect status' })
-  }
-})
-server.delete('/api/v1/tasks/:category/:id', async (req, res) => {
-  const { category, id } = req.params
-  const tasks = await read(category)
-  const deleted = tasks.map((el) => (el.taskId === id ? { ...el, _isDeleted: true } : el))
-  await write(category, deleted)
-  res.json({ status: 'deleted' })
-})
+
 server.get('/api/v1/tasks/:category/:timespan', async (req, res) => {
   const { category, timespan } = req.params
   const tasks = await read(category)
@@ -130,11 +96,64 @@ server.get('/api/v1/tasks/:category/:timespan', async (req, res) => {
   )
   res.json(filteredTasks)
 })
-server.get('/api/v1/categories', async (req, res) => {
-  const categories = (await readdir(`${__dirname}/categories`)).map((el) =>
-    el.split('.json').join('')
-  )
-  res.json(categories)
+
+server.post('/api/v1/tasks/:category', async (req, res) => {
+  const { category } = req.params
+  if (Object.keys(req.body).length === 0) {
+    await write(category, [])
+    res.json({ status: 'Added' })
+  } else {
+    const tasks = await read(category)
+    const newTask = {
+      taskId: shortid.generate(),
+      title: req.body.title,
+      status: 'new',
+      _isDeleted: false,
+      _createdAt: +new Date(),
+      _deletedAt: null
+    }
+    const addedTasks = [...tasks, newTask]
+    await write(category, addedTasks)
+    res.json({ status: 'added successfully', newTask })
+  }
+})
+
+server.patch('/api/v1/tasks/:category/:id', async (req, res) => {
+  const { category, id } = req.params
+  const newStatus = req.body.status
+  const statuses = ['new', 'in progress', 'done', 'blocked']
+  if (statuses.includes(newStatus)) {
+    const tasks = await read(category)
+    const updatedStatus = tasks.map((el) => (el.taskId === id ? { ...el, status: newStatus } : el))
+    await write(category, updatedStatus)
+    res.json({ status: 'updated successfully' })
+  } else {
+    res.status(501)
+    res.json({ status: 'error', message: 'incorrect status' })
+  }
+})
+
+server.patch('/api/v1/tasks-rename/:category/:id', async (req, res) => {
+  const { category, id } = req.params
+  const newTitle = req.body.title
+  const tasks = await read(category)
+  const updatedTaskName = tasks.map((el) => (el.taskId === id ? { ...el, title: newTitle } : el))
+  await write(category, updatedTaskName)
+  res.json({ status: 'updated successfully' })
+})
+
+server.delete('/api/v1/tasks/:category/:id', async (req, res) => {
+  const { category, id } = req.params
+  const tasks = await read(category)
+  const deleted = tasks.map((el) => (el.taskId === id ? { ...el, _isDeleted: true } : el))
+  await write(category, deleted)
+  res.json({ status: 'deleted' })
+})
+
+server.delete('/api/v1/:category', async (req, res) => {
+  const { category } = req.params
+  await unlink(`${__dirname}/categories/${category}.json`)
+  res.json({ status: 'deleted successfully' })
 })
 
 server.use('/api/', (req, res) => {
